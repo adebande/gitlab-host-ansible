@@ -1,9 +1,16 @@
+- name: set hostname
+  hostname:
+    name: "{{ hostname }}"
+
 - name: set postfix mail name
   debconf:
     name: postfix
     question: postfix/mailname
     value: "{{ hostname }}"
     vtype: string
+  notify: 
+    - change mailname
+    - restart postfix
 
 - name: set postfix option type as internet site
   debconf:
@@ -19,3 +26,11 @@
       - postfix
     state: latest
     update_cache: true
+
+- name: postfix config file
+  template:
+    src: templates/main.cf.j2
+    dest: /etc/postfix/main.cf
+    owner: {{ debian_username }}
+    mode: 0600
+  notify: restart postfix
