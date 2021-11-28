@@ -1,0 +1,33 @@
+- name: check packages
+  package_facts:
+    manager: "apt"
+
+- name: add gitlab-ce repository
+  block:
+    - name: download script
+      get_url:
+        url: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh
+        dest: /home/{{ debian_username  }}/script.deb.sh
+        owner: "{{ debian_username }}"
+        mode: 0755
+
+    - name: run script
+      shell: /home/{{ debian_username  }}/script.deb.sh
+  when: "'gitlab-ce' not in ansible_facts.packages"
+
+
+- name: install gitlab
+  apt:
+   name: gitlab-ce
+   state: present
+   update_cache: true
+
+- name: gitlab config
+  template:
+    src: templates/gitlab.rb.j2
+    dest: /etc/gitlab/gitlab.rb
+    owner: root
+    group: root
+    mode: 0755
+  notify: reconfigure gitlab
+

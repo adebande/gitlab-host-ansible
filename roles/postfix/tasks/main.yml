@@ -31,6 +31,6 @@
   template:
     src: templates/main.cf.j2
     dest: /etc/postfix/main.cf
-    owner: {{ debian_username }}
+    owner: "{{ debian_username }}"
     mode: 0600
   notify: restart postfix
