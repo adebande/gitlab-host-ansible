@@ -1,0 +1,21 @@
+- name: set postfix mail name
+  debconf:
+    name: postfix
+    question: postfix/mailname
+    value: "{{ hostname }}"
+    vtype: string
+
+- name: set postfix option type as internet site
+  debconf:
+    name: postfix
+    question: postfix/main_mailer_type
+    value: Internet Site
+    vtype: "select"
+
+- name: install postfix
+  apt:
+    pkg:
+      - mailutils
+      - postfix
+    state: latest
+    update_cache: true
