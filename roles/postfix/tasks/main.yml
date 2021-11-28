@@ -34,3 +34,8 @@
     owner: "{{ debian_username }}"
     mode: 0600
   notify: restart postfix
+
+- name: start postfix
+  service:
+    name: postfix
+    state: started
