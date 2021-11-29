@@ -1,3 +1,36 @@
+- name: install dependencies
+  apt:
+   name: python-cryptography
+   state: present
+   update_cache: true
+
+- name: Create ssl directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items:
+    - /etc/ssl/csr/
+    - /etc/ssl/private/
+
+- name: generate openssl private key
+  openssl_privatekey:
+    path: "/etc/ssl/private/{{ hostname }}.pem"
+
+
+- name: generate openssl csr
+  openssl_csr:
+    path: "/etc/ssl/csr/{{ hostname }}.csr"
+    privatekey_path: "/etc/ssl/private/{{ hostname }}.pem"
+    common_name: "{{ hostname }}"
+
+- name: generate ssl certificate
+  openssl_certificate:
+    path: "/etc/gitlab/ssl/{{ hostname }}.crt"
+    privatekey_path: "/etc/gitlab/ssl/{{ hostname }}.key"
+    csr_path: "/etc/ssl/csr/{{ hostname }}.csr"
+    provider: selfsigned
+
 - name: check packages
   package_facts:
     manager: "apt"
